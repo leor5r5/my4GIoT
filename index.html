@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <title>แสดงและควบคุมอุปกรณ์</title>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Prompt&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Prompt', sans-serif;
+      background: linear-gradient(to bottom right, #cbf1f7, #b1f5b3);
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+    }
+
+    .container {
+      background: white;
+      padding: 40px;
+      border-radius: 20px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+      text-align: center;
+      max-width: 400px;
+      width: 90%;
+    }
+
+    h2 {
+      margin-bottom: 20px;
+      color: #00796b;
+    }
+
+    #status {
+      font-size: 36px;
+      font-weight: bold;
+      margin: 20px 0;
+      transition: color 0.3s ease;
+    }
+
+    .status-on {
+      color: #4caf50;
+    }
+
+    .status-off {
+      color: #f44336;
+    }
+
+    .status-none {
+      color: #9e9e9e;
+    }
+
+    button {
+      font-size: 20px;
+      padding: 12px 32px;
+      margin: 10px;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: background-color 0.3s ease, transform 0.2s;
+    }
+
+    button:hover {
+      transform: scale(1.05);
+    }
+
+    .on {
+      background-color: #4caf50;
+      color: white;
+    }
+
+    .off {
+      background-color: #f44336;
+      color: white;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>สถานะอุปกรณ์</h2>
+    <div id="status" class="status-none">กำลังโหลด...</div>
+
+    <h2>ควบคุมอุปกรณ์</h2>
+    <button class="on" onclick="setStatus(1)">เปิด</button>
+    <button class="off" onclick="setStatus(0)">ปิด</button>
+  </div>
+
+  <script>
+    // Firebase Configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyBN8OuiMFTZ7CrSe_Psy4PSW4xSX7bPWyA",
+      authDomain: "myiot-92b38.firebaseapp.com",
+      projectId: "myiot-92b38",
+      storageBucket: "myiot-92b38.firebasestorage.app",
+      messagingSenderId: "729539743207",
+      appId: "1:729539743207:web:8e2f298ea6f7e9b6118142",
+      measurementId: "G-SBEC3WLZ1M"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    const statusDiv = document.getElementById("status");
+
+    // แสดงสถานะเรียลไทม์
+    db.collection("devices").doc("device1")
+      .onSnapshot((doc) => {
+        if (doc.exists) {
+          const status = doc.data().status;
+          if (status === 1) {
+            statusDiv.textContent = "เปิด";
+            statusDiv.className = "status-on";
+          } else {
+            statusDiv.textContent = "ปิด";
+            statusDiv.className = "status-off";
+          }
+        } else {
+          statusDiv.textContent = "ไม่มีข้อมูล";
+          statusDiv.className = "status-none";
+        }
+      });
+
+    // ปุ่มควบคุมอุปกรณ์
+    function setStatus(value) {
+      db.collection("devices").doc("device1").set({
+        status: value
+      }).then(() => {
+        alert("เปลี่ยนสถานะเป็น " + (value === 1 ? "เปิด" : "ปิด"));
+      });
+    }
+  </script>
+</body>
+</html>
